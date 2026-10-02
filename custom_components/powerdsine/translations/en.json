@@ -1,0 +1,53 @@
+{
+  "title": "PowerDsine PoE",
+  "config": {
+    "step": {
+      "user": {
+        "title": "Connect to PowerDsine",
+        "description": "Enter the management address and SNMP version.",
+        "data": {
+          "host": "Host",
+          "port": "SNMP port",
+          "snmp_version": "SNMP version"
+        }
+      },
+      "community": {
+        "title": "SNMP community",
+        "description": "The write community is optional. If empty, the read community is used for SET operations.",
+        "data": {
+          "community": "Read community",
+          "write_community": "Write community"
+        }
+      },
+      "v3": {
+        "title": "SNMPv3 credentials",
+        "data": {
+          "username": "Username",
+          "auth_protocol": "Authentication protocol",
+          "auth_key": "Authentication key",
+          "priv_protocol": "Privacy protocol",
+          "priv_key": "Privacy key"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Could not connect to a supported PowerDsine/Microsemi PoE midspan.",
+      "key_too_short": "SNMPv3 keys must contain at least 8 characters.",
+      "auth_required_for_privacy": "Privacy requires authentication."
+    },
+    "abort": {
+      "already_configured": "This PowerDsine is already configured."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "PowerDsine options",
+        "data": {
+          "scan_interval": "Polling interval (seconds)",
+          "power_cycle_delay": "Power-cycle off time (seconds)"
+        }
+      }
+    }
+  }
+}
