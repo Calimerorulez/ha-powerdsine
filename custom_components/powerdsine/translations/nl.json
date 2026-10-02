@@ -1,0 +1,53 @@
+{
+  "title": "PowerDsine PoE",
+  "config": {
+    "step": {
+      "user": {
+        "title": "Verbinden met PowerDsine",
+        "description": "Vul het managementadres en de SNMP-versie in.",
+        "data": {
+          "host": "Host",
+          "port": "SNMP-poort",
+          "snmp_version": "SNMP-versie"
+        }
+      },
+      "community": {
+        "title": "SNMP-community",
+        "description": "De write-community is optioneel. Indien leeg wordt de read-community ook voor SET gebruikt.",
+        "data": {
+          "community": "Read-community",
+          "write_community": "Write-community"
+        }
+      },
+      "v3": {
+        "title": "SNMPv3-inloggegevens",
+        "data": {
+          "username": "Gebruikersnaam",
+          "auth_protocol": "Authenticatieprotocol",
+          "auth_key": "Authenticatiesleutel",
+          "priv_protocol": "Encryptieprotocol",
+          "priv_key": "Encryptiesleutel"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Kan geen verbinding maken met een ondersteunde PowerDsine/Microsemi PoE-midspan.",
+      "key_too_short": "SNMPv3-sleutels moeten minimaal 8 tekens lang zijn.",
+      "auth_required_for_privacy": "Encryptie vereist authenticatie."
+    },
+    "abort": {
+      "already_configured": "Deze PowerDsine is al geconfigureerd."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "PowerDsine-opties",
+        "data": {
+          "scan_interval": "Pollinginterval (seconden)",
+          "power_cycle_delay": "Uitschakeltijd bij power-cycle (seconden)"
+        }
+      }
+    }
+  }
+}
