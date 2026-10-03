@@ -9,14 +9,17 @@ from typing import Any
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
 from .const import (
     BACKUP_STATUS,
     DETECTION_STATUS,
+    DOMAIN,
     MAIN_STATUS,
     OID_SYS_DESCR,
     OID_SYS_NAME,
+    OID_SYS_UPTIME,
     OID_SYS_OBJECT_ID,
     POWER_CLASS,
     POWERDSINE_SYSOBJECT_PREFIX,
@@ -44,6 +47,7 @@ from .const import (
     main_oid,
     port_oid,
 )
+from .device_info import parse_system_description
 from .snmp import PowerDsineSnmpClient, PowerDsineSnmpError
 
 _LOGGER = logging.getLogger(__name__)
@@ -111,6 +115,7 @@ class PowerDsineCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         chassis_oids = {
             "sys_name": OID_SYS_NAME,
             "sys_descr": OID_SYS_DESCR,
+            "uptime_ticks": OID_SYS_UPTIME,
             "nominal_power": main_oid(RFC_MAIN_POWER),
             "oper_status": main_oid(RFC_MAIN_STATUS),
             "total_consumption": main_oid(RFC_MAIN_CONSUMPTION),
@@ -164,6 +169,25 @@ class PowerDsineCoordinator(DataUpdateCoordinator[dict[str, Any]]):
                 chassis[field] = value
             else:
                 ports[port][field] = value
+
+        chassis.update(parse_system_description(chassis.get("sys_descr")))
+        uptime = chassis.get("uptime_ticks")
+        if isinstance(uptime, int) and uptime >= 0:
+            chassis["uptime"] = uptime / 100
+
+        # Keep the device page current after a management firmware update.
+        registry = dr.async_get(self.hass)
+        device = registry.async_get_device(identifiers={(DOMAIN, self.entry.entry_id)})
+        if device is not None:
+            updates = {}
+            for key, value in (
+                ("sw_version", chassis.get("software_version")),
+                ("serial_number", chassis.get("serial_number")),
+            ):
+                if value is not None and getattr(device, key) != value:
+                    updates[key] = value
+            if updates:
+                registry.async_update_device(device.id, **updates)
 
         if chassis.get("oper_status") is not None:
             chassis["oper_status_text"] = MAIN_STATUS.get(chassis["oper_status"], "unknown")

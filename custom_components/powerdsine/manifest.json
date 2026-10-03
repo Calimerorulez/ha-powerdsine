@@ -9,5 +9,5 @@
   "issue_tracker": "https://github.com/Calimerorulez/ha-powerdsine/issues",
   "loggers": ["pysnmp"],
   "requirements": ["pysnmp>=7.1.27"],
-  "version": "0.1.1"
+  "version": "0.1.2"
 }
