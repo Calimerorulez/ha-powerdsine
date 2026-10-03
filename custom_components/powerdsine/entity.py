@@ -21,6 +21,8 @@ class PowerDsineEntity(CoordinatorEntity[PowerDsineCoordinator]):
             identifiers={(DOMAIN, coordinator.entry.entry_id)},
             manufacturer="PowerDsine / Microsemi",
             model=product.model,
+            sw_version=coordinator.data["chassis"].get("software_version"),
+            serial_number=coordinator.data["chassis"].get("serial_number"),
             name=coordinator.entry.title,
             configuration_url=f"http://{coordinator.entry.data['host']}",
         )

@@ -7,7 +7,7 @@ from typing import Any, Callable
 
 from homeassistant.components.sensor import SensorDeviceClass, SensorEntity, SensorEntityDescription, SensorStateClass
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import UnitOfElectricPotential, UnitOfPower
+from homeassistant.const import UnitOfElectricPotential, UnitOfPower, UnitOfTime
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity import EntityCategory
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
@@ -23,6 +23,42 @@ class PowerDsineSensorDescription(SensorEntityDescription):
 
 
 CHASSIS_SENSORS = (
+    PowerDsineSensorDescription(
+        key="software_version",
+        name="Management software version",
+        entity_category=EntityCategory.DIAGNOSTIC,
+        icon="mdi:chip",
+        value_fn=lambda d: d.get("software_version"),
+    ),
+    PowerDsineSensorDescription(
+        key="boot_version",
+        name="Boot version",
+        entity_category=EntityCategory.DIAGNOSTIC,
+        icon="mdi:chip",
+        value_fn=lambda d: d.get("boot_version"),
+    ),
+    PowerDsineSensorDescription(
+        key="serial_number",
+        name="Serial number",
+        entity_category=EntityCategory.DIAGNOSTIC,
+        icon="mdi:identifier",
+        value_fn=lambda d: d.get("serial_number"),
+    ),
+    PowerDsineSensorDescription(
+        key="sys_name",
+        name="System name",
+        entity_category=EntityCategory.DIAGNOSTIC,
+        icon="mdi:label",
+        value_fn=lambda d: d.get("sys_name"),
+    ),
+    PowerDsineSensorDescription(
+        key="uptime",
+        name="Management uptime",
+        entity_category=EntityCategory.DIAGNOSTIC,
+        device_class=SensorDeviceClass.DURATION,
+        native_unit_of_measurement=UnitOfTime.SECONDS,
+        value_fn=lambda d: d.get("uptime"),
+    ),
     PowerDsineSensorDescription(
         key="total_consumption",
         name="Total PoE power",
@@ -128,6 +164,14 @@ class PowerDsineChassisSensor(PowerDsineEntity, SensorEntity):
     @property
     def native_value(self):
         return self.entity_description.value_fn(self.coordinator.data["chassis"])
+
+
+    @property
+    def extra_state_attributes(self):
+        """Expose the raw description without the sensor state length limit."""
+        if self.entity_description.key == "software_version":
+            return {"system_description": self.coordinator.data["chassis"].get("sys_descr")}
+        return None
 
 
 class PowerDsinePortSensor(PowerDsinePortEntity, SensorEntity):

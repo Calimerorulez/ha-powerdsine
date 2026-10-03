@@ -30,6 +30,8 @@ Developed for the PowerDsine **PD-90xxG** family, including the 24-port PD-9024G
   - power backup state
   - internal/external PSU problem sensors
   - configurable overall power-budget percentage
+- Device information: management software version and serial number on the device page
+- Diagnostic sensors: management software version, boot version, serial number, system name and management uptime
 - Diagnostics with SNMP secrets redacted
 - English and Dutch translations
 
@@ -93,6 +95,22 @@ The private measured port-power OID for port 7 is:
 
 ## Development status
 
-This is an initial implementation (`0.1.0`) built from the supplied MIB definitions. The code is designed so the first real device test requires no `snmpwalk`; unsupported optional OIDs simply return no value.
+This implementation (`0.1.2`) built from the supplied MIB definitions. The code is designed so the first real device test requires no `snmpwalk`; unsupported optional OIDs simply return no value.
 
 If your exact firmware rejects a documented SET operation, Home Assistant will log the SNMP error and the device remains unchanged.
+
+## Device information
+
+The management software version, boot version and serial number are parsed from
+explicit `App Ver=`, `BOOT Ver=` and `Unit S/N=` labels in SNMP `sysDescr`.
+Serial numbers retain leading zeroes. Missing or unrecognized fields remain unknown.
+The full description is available as an attribute on the management software sensor.
+The device registry is updated when the reported software version changes.
+
+Management uptime uses `sysUpTime.0` (hundredths of a second, converted to seconds).
+This measures the SNMP management subsystem, not the time PoE has been supplying power,
+and the 32-bit counter wraps after approximately 497 days.
+
+The separate PoE controller firmware version, exact part number, flash size and
+production number are not supplied by this private MIB or the observed `sysDescr`;
+they are not inferred from the web interface or hardcoded for a particular device.
